@@ -16,7 +16,7 @@ class SnowflakeIntegration:
         warehouse:str="COMPUTE_WH"
         database:str="SNOWFLAKE_SAMPLE_DATA"
         schema:str="TPCH_SF1"
-
+        page_size: int = 10
         log_file_name:str="snowflake_connector.log"
 
         logging.basicConfig(
@@ -44,11 +44,11 @@ class SnowflakeIntegration:
                 time.sleep(1)
             logging.info(conn.get_query_status(query_id))
             cursor.get_results_from_sfqid(query_id)
-            data:list[dict] = cursor.fetchmany(10)
+            data:list[dict] = cursor.fetchmany(page_size)
             print('*******************************************************************************')
             self.displayData(data)
             while(len(data)>0):
-                data:list[dict] = cursor.fetchmany(10)
+                data:list[dict] = cursor.fetchmany(page_size)
                 self.displayData(data)
         except ValueError as e:
             logging.error(e)
