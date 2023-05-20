@@ -16,7 +16,7 @@ class SnowflakeIntegration:
         warehouse:str="COMPUTE_WH"
         database:str="SNOWFLAKE_SAMPLE_DATA"
         schema:str="TPCH_SF1"
-        page_size: int = 10
+        page_size:int = 10
         log_file_name:str="snowflake_connector.log"
 
         logging.basicConfig(
