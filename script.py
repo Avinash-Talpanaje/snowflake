@@ -12,7 +12,7 @@ class SnowflakeIntegration:
         user:str=os.getenv("SNOWFLAKE_USER")
         password:str=os.getenv("SNOWFLAKE_PASSWORD")
         account:str=os.getenv("SNOWFLAKE_ACCOUNT")
-        role:str = "USERADMIN"
+        role:str = os.getenv("SNOWFLAKE_USER_ROLE","USERADMIN")
         warehouse:str="COMPUTE_WH"
         database:str="SNOWFLAKE_SAMPLE_DATA"
         schema:str="TPCH_SF1"
@@ -21,7 +21,7 @@ class SnowflakeIntegration:
 
         logging.basicConfig(
             filename=log_file_name,
-            level=logging.INFO)
+            level=logging.ERROR)
 
         try:
             conn:SnowflakeConnection = snowflake.connector.connect(
@@ -38,12 +38,14 @@ class SnowflakeIntegration:
             '''
             cursor.execute_async(sql_query)
             query_id:str = cursor.sfqid
+            print('*******************************************************************************')
             while conn.is_still_running(conn.get_query_status(query_id)):
-                print("%s query still running", format(query_id))
+                print("{} query still running".format(query_id))
                 time.sleep(1)
             logging.info(conn.get_query_status(query_id))
             cursor.get_results_from_sfqid(query_id)
             data:list[dict] = cursor.fetchmany(10)
+            print('*******************************************************************************')
             self.displayData(data)
             while(len(data)>0):
                 data:list[dict] = cursor.fetchmany(10)
@@ -56,8 +58,6 @@ class SnowflakeIntegration:
             logging.critical(e)
         finally:
             conn.close()
-
-        
 
 snow:SnowflakeIntegration = SnowflakeIntegration()
 snow.run()
